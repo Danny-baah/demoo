@@ -1,0 +1,1379 @@
+/* ==========================================================================
+   DESIGN TOKENS & RESET
+   ========================================================================== */
+:root {
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Color Palette */
+  --color-bg: #090a0d;
+  --color-text-main: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.78);
+  --color-text-dim: rgba(255, 255, 255, 0.5);
+
+  /* Amber / Heating Theme */
+  --amber-gold: #e5a663;
+  --amber-bright: #ffb870;
+  --amber-deep: #c86e28;
+  --amber-glow: rgba(229, 166, 99, 0.45);
+  --amber-glass-bg: rgba(25, 18, 14, 0.7);
+  --amber-border: rgba(229, 166, 99, 0.28);
+
+  /* Cyan / Sanitary Theme */
+  --cyan-bright: #5ce1e6;
+  --cyan-main: #38bdf8;
+  --cyan-deep: #0284c7;
+  --cyan-glow: rgba(56, 189, 248, 0.45);
+  --cyan-glass-bg: rgba(14, 22, 28, 0.7);
+  --cyan-border: rgba(56, 189, 248, 0.28);
+
+  /* Neutral Glass & Shadows */
+  --glass-bg: rgba(15, 17, 22, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --card-shadow: 0 24px 50px rgba(0, 0, 0, 0.65);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+/* ==========================================================================
+   INITIAL LUXURY LOADER
+   ========================================================================== */
+.hero-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #090a0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s ease;
+}
+
+.hero-loader.loaded {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-content {
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+}
+
+.loader-brand {
+  font-family: var(--font-sans);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #fff;
+  margin-bottom: 24px;
+}
+
+.loader-bar-wrap {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.loader-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--amber-deep), var(--amber-gold), #fff);
+  box-shadow: 0 0 12px var(--amber-glow);
+  transition: width 0.15s ease-out;
+}
+
+.loader-status {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+}
+
+/* ==========================================================================
+   PINNED HERO CONTAINER
+   ========================================================================== */
+.hero-scroll-container {
+  position: relative;
+  width: 100%;
+  height: 400vh;
+}
+
+.hero-pinned-viewport {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fullscreen Canvas */
+.hero-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   FINAL HERO FULL-SCREEN BACKGROUND CROSSFADE LAYERS (Heizung & Sanitär)
+   ========================================================================== */
+.hero-bg-crossfade-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-bg-crossfade-wrap.active {
+  opacity: 1;
+}
+
+.hero-bg-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.bg-layer-sanitaer {
+  background-image: url('/sanitaer_hero_bg.webp');
+  opacity: 1;
+  transform: scale(1);
+}
+
+.bg-layer-heizung {
+  background-image: url('/heating_hero_bg.webp');
+  opacity: 0;
+  transform: scale(1.02);
+}
+
+/* Heizung active state on the background wrapper */
+.hero-bg-crossfade-wrap.heizung-mode .bg-layer-sanitaer {
+  opacity: 0;
+  transform: scale(1.02);
+}
+
+.hero-bg-crossfade-wrap.heizung-mode .bg-layer-heizung {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Cinematic Overlays for Depth, Sunset Glow, and Text Contrast */
+.cinematic-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: 
+    radial-gradient(circle at 82% 38%, rgba(0,0,0,0) 30%, rgba(5,6,8,0.25) 80%, rgba(5,6,8,0.55) 100%),
+    linear-gradient(90deg, rgba(6,7,10,0.85) 0%, rgba(6,7,10,0.62) 35%, rgba(6,7,10,0.2) 60%, rgba(6,7,10,0) 80%),
+    linear-gradient(180deg, rgba(6,7,10,0.55) 0%, rgba(6,7,10,0) 18%, rgba(6,7,10,0) 80%, rgba(6,7,10,0.65) 100%);
+}
+
+/* ==========================================================================
+   TRANSPARENT INTEGRATED NAVBAR
+   ========================================================================== */
+.hero-navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 84px;
+  z-index: 20;
+  pointer-events: auto;
+  transition: background-color 0.4s ease;
+}
+
+.navbar-inner {
+  max-width: 1720px;
+  margin: 0 auto;
+  padding: 0 4.5vw;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-logo {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  text-decoration: none;
+  transition: opacity 0.25s ease;
+}
+
+.brand-logo:hover {
+  opacity: 0.85;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  transition: color 0.25s ease;
+  padding: 6px 0;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+.nav-link.active {
+  color: #ffffff;
+}
+
+.nav-active-pill {
+  position: absolute;
+  bottom: 0;
+  width: 20px;
+  height: 2px;
+  background-color: var(--amber-gold);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--amber-glow);
+}
+
+.nav-item-dropdown .nav-link {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.chevron-icon {
+  transition: transform 0.25s ease;
+  opacity: 0.8;
+}
+
+.nav-item-dropdown:hover .chevron-icon {
+  transform: translateY(2px);
+  opacity: 1;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-touch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  border: 1px solid rgba(229, 166, 99, 0.55);
+  background: rgba(180, 100, 40, 0.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.btn-touch:hover {
+  background: rgba(220, 120, 45, 0.45);
+  border-color: rgba(255, 200, 130, 0.85);
+  box-shadow: 0 0 24px rgba(229, 166, 99, 0.4);
+  transform: translateY(-1px);
+}
+
+.arrow-glyph {
+  font-size: 14px;
+  transition: transform 0.25s ease;
+}
+
+.btn-touch:hover .arrow-glyph {
+  transform: translate(2px, -2px);
+}
+
+/* ==========================================================================
+   DYNAMIC STAGE NARRATIVE OVERLAY (State A Cinematic Sequence)
+   Phase 1: From Left (middle vertically)
+   Phase 2: From Right (middle vertically)
+   Phase 3: From Beneath (bottom center)
+   ========================================================================== */
+.stage-narrative-item {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Phase 1: Left & Vertically Centered (comes in from the left) */
+.stage-phase-1 {
+  top: 50%;
+  left: 6vw;
+  max-width: 520px;
+  text-align: left;
+  transform: translate(-50px, -50%);
+}
+
+.stage-phase-1.visible {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+/* Phase 2: Right & Vertically Centered (comes in from the right) */
+.stage-phase-2 {
+  top: 50%;
+  right: 6vw;
+  max-width: 520px;
+  text-align: right;
+  transform: translate(50px, -50%);
+}
+
+.stage-phase-2 .narrative-badge {
+  margin-left: auto;
+}
+
+.stage-phase-2.visible {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+/* Phase 3: Bottom Centered (comes in from beneath) */
+.stage-phase-3 {
+  left: 50%;
+  bottom: 12vh;
+  width: 90%;
+  max-width: 620px;
+  text-align: center;
+  transform: translate(-50%, 45px);
+}
+
+.stage-phase-3 .narrative-badge {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stage-phase-3.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.narrative-badge {
+  display: table;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  color: var(--amber-gold);
+  background: rgba(229, 166, 99, 0.14);
+  border: 1px solid rgba(229, 166, 99, 0.35);
+  padding: 4px 14px;
+  border-radius: 9999px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.narrative-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 2.9vw, 44px);
+  line-height: 1.18;
+  font-weight: 500;
+  color: #ffffff;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
+}
+
+/* ==========================================================================
+   FINAL HERO INTERACTIVE LAYER (State B & C)
+   ========================================================================== */
+.hero-content-layer {
+  position: absolute;
+  top: 13vh;
+  left: 4.5vw;
+  z-index: 15;
+  pointer-events: auto;
+  max-width: 530px;
+  width: 90%;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-content-layer.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--amber-gold);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(40px, 4.3vw, 68px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+  margin-bottom: 14px;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+}
+
+.accent-verborgenen {
+  color: var(--amber-gold);
+  background: linear-gradient(180deg, #f7bf85 0%, #db8f40 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  filter: drop-shadow(0 0 12px rgba(229, 166, 99, 0.3));
+}
+
+.hero-desc {
+  font-size: clamp(14px, 1.05vw, 16.5px);
+  font-weight: 300;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 24px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+/* ==========================================================================
+   SEGMENTED SERVICE TOGGLE
+   ========================================================================== */
+.service-toggle-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(14, 18, 24, 0.65);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 4px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.toggle-btn {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 24px;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.2s ease;
+  user-select: none;
+}
+
+.toggle-btn:hover {
+  color: #ffffff;
+}
+
+.toggle-btn.active {
+  color: #ffffff;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+#btn-toggle-heizung .btn-icon {
+  color: var(--amber-gold);
+}
+
+#btn-toggle-sanitaer .btn-icon {
+  color: var(--cyan-bright);
+}
+
+/* Sliding active pill indicator (Sanitär is default on the left) */
+.toggle-pill-slider {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: 9999px;
+  z-index: 1;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  
+  /* Default: Sanitär Active (Cyan treatment) */
+  background: linear-gradient(135deg, rgba(14, 116, 160, 0.95), rgba(8, 65, 100, 0.95));
+  border: 1px solid rgba(92, 225, 230, 0.75);
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.45), inset 0 1px 0 rgba(160, 235, 255, 0.35);
+}
+
+/* Heizung Active State on Slider (Moves to the right with amber treatment) */
+.service-toggle-container.heizung-active .toggle-pill-slider {
+  transform: translateX(100%);
+  background: linear-gradient(135deg, rgba(205, 115, 45, 0.95), rgba(135, 68, 22, 0.95));
+  border-color: rgba(255, 185, 105, 0.75);
+  box-shadow: 0 0 25px rgba(229, 166, 99, 0.45), inset 0 1px 0 rgba(255, 220, 160, 0.35);
+}
+
+/* ==========================================================================
+   DIRECT DYNAMIC SERVICE TYPOGRAPHY & CTA (NO CARD)
+   ========================================================================== */
+.service-direct-content {
+  margin-top: 6px;
+  max-width: 460px;
+  width: 100%;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.service-direct-content.transitioning {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* Default Service Heading: Sanitär (Cyan) */
+.service-direct-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 2.3vw, 32px);
+  font-weight: 500;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  color: var(--cyan-bright);
+  margin-bottom: 12px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85);
+  transition: color 0.4s ease;
+}
+
+/* Heizung Theme for Heading */
+.service-direct-content.heizung-theme .service-direct-heading {
+  color: var(--amber-gold);
+}
+
+.service-direct-desc {
+  font-family: var(--font-sans);
+  font-size: clamp(14px, 1.05vw, 15.5px);
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 24px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
+}
+
+.service-direct-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+/* Default CTA Circle Icon: Sanitär (Cyan) */
+.cta-circle-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(92, 225, 230, 0.65);
+  background: rgba(92, 225, 230, 0.08);
+  color: var(--cyan-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
+}
+
+/* Heizung Theme for CTA Circle Icon */
+.service-direct-content.heizung-theme .cta-circle-icon {
+  border-color: rgba(229, 166, 99, 0.65);
+  background: rgba(229, 166, 99, 0.08);
+  color: var(--amber-gold);
+}
+
+.cta-circle-icon svg {
+  transition: transform 0.25s ease;
+}
+
+.cta-label {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.02em;
+  transition: color 0.3s ease;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+/* Default Hover: Sanitär (Cyan) */
+.service-direct-cta:hover .cta-circle-icon {
+  transform: scale(1.08);
+  background: rgba(92, 225, 230, 0.25);
+  border-color: var(--cyan-bright);
+  box-shadow: 0 0 20px var(--cyan-glow);
+}
+
+.service-direct-cta:hover .cta-circle-icon svg {
+  transform: translateX(3px);
+}
+
+/* Heizung Hover: Amber */
+.service-direct-content.heizung-theme .service-direct-cta:hover .cta-circle-icon {
+  background: rgba(229, 166, 99, 0.25);
+  border-color: var(--amber-bright);
+  box-shadow: 0 0 20px var(--amber-glow);
+}
+
+.service-direct-cta:hover .cta-label {
+  color: #ffffff;
+}
+
+
+/* ==========================================================================
+   SCROLL GUIDANCE CUE (Bottom Right)
+   ========================================================================== */
+.hero-scroll-cue {
+  position: absolute;
+  bottom: 34px;
+  right: 4.5vw;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.mouse-icon {
+  width: 16px;
+  height: 26px;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.mouse-wheel {
+  width: 3px;
+  height: 5px;
+  background-color: var(--amber-gold);
+  border-radius: 2px;
+  box-shadow: 0 0 6px var(--amber-glow);
+  animation: mouseScroll 1.8s infinite;
+}
+
+@keyframes mouseScroll {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.scroll-cue-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scroll-cue-text {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.scroll-tracker-track {
+  width: 80px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  position: relative;
+}
+
+.scroll-tracker-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber-gold);
+  box-shadow: 0 0 8px var(--amber-glow);
+  transform: translate(-50%, -50%);
+  transition: left 0.1s linear;
+}
+
+/* ==========================================================================
+   ÜBER UNS SECTION (Editorial Architectural Split Section)
+   ========================================================================== */
+.about-section {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  background: #f8f6f1;
+  color: #1a1d20;
+  padding: 0;
+  overflow: hidden;
+}
+
+.about-container {
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 46% 54%;
+  align-items: stretch;
+}
+
+/* --- Left Column: Editorial Content --- */
+.about-content-column {
+  padding: clamp(60px, 7vh, 100px) clamp(20px, 2.5vw, 45px) clamp(60px, 7vh, 100px) clamp(30px, 5.5vw, 90px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 660px;
+  margin: 0 0 0 auto;
+  width: 100%;
+}
+
+.about-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.about-eyebrow-line {
+  display: inline-block;
+  width: 28px;
+  height: 1.5px;
+  background: #9a9286;
+}
+
+.about-eyebrow-text {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: #8c8376;
+  text-transform: uppercase;
+}
+
+.about-headline {
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 3.1vw, 49px);
+  font-weight: 500;
+  line-height: 1.14;
+  letter-spacing: -0.015em;
+  color: #16191c;
+  margin-bottom: 20px;
+}
+
+.about-headline-accent {
+  color: #bf8237;
+  background: linear-gradient(135deg, #c78033 0%, #aa641f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline;
+}
+
+.about-description {
+  font-family: var(--font-sans);
+  font-size: clamp(14px, 0.92vw, 15px);
+  font-weight: 400;
+  line-height: 1.68;
+  color: #5d574e;
+  margin-bottom: 34px;
+  max-width: 440px;
+}
+
+/* 4 Core Value Pillars Grid */
+.about-values-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 34px;
+}
+
+.about-value-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.value-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  transition: transform 0.3s ease;
+}
+
+.about-value-item:hover .value-icon-circle {
+  transform: translateY(-2px);
+}
+
+.icon-sage {
+  background: #eaf3ee;
+  color: #226f4f;
+}
+
+.icon-sand {
+  background: #faede0;
+  color: #b3631d;
+}
+
+.icon-sky {
+  background: #e3eff7;
+  color: #26739b;
+}
+
+.icon-gold {
+  background: #faefe1;
+  color: #a96f28;
+}
+
+.value-title {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #181b1e;
+  margin-bottom: 4px;
+}
+
+.value-desc {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: #766f65;
+}
+
+/* Key Metrics / Statistics Row (Clean whitespace without top/bottom borders) */
+.about-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 6px 0;
+  margin-bottom: 34px;
+}
+
+.about-stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-stat-num {
+  font-family: Georgia, 'Playfair Display', var(--font-serif);
+  font-size: clamp(30px, 2.4vw, 40px);
+  font-weight: 400;
+  line-height: 1;
+  color: #16191c;
+  margin-bottom: 6px;
+}
+
+.about-stat-label {
+  font-size: 12.5px;
+  color: #766f65;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.about-stat-divider {
+  width: 1px;
+  height: 38px;
+  background: rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+/* Action Buttons */
+.about-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-about-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 28px;
+  border-radius: 9999px;
+  background: #1c2024;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.btn-about-primary:hover {
+  background: #2f343b;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+  transform: translateY(-1px);
+}
+
+.btn-about-primary .btn-arrow {
+  font-size: 15px;
+  transition: transform 0.25s ease;
+}
+
+.btn-about-primary:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+.btn-about-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 26px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  color: #1c2024;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-about-secondary:hover {
+  border-color: #1c2024;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* --- Right Column: Visual Stage with Full Bleed Photo & Floating Elements --- */
+.about-visual-column {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 640px;
+}
+
+.about-image-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.about-villa-photo {
+  width: 100%;
+  height: 100%;
+  min-height: 640px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Experience Badge (SEIT 2008 - perfectly positioned on split seam) */
+.about-experience-badge {
+  position: absolute;
+  top: 36%;
+  left: 0;
+  transform: translate(-30%, -50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 22px;
+  background: #f4efe7;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  white-space: nowrap;
+}
+
+.about-experience-badge:hover {
+  transform: translate(-30%, -52%);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.16);
+}
+
+.exp-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #181b1e;
+  flex-shrink: 0;
+}
+
+.exp-text-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.exp-since-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #8c8375;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.exp-year {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 600;
+  color: #181b1e;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.exp-note {
+  font-size: 11px;
+  color: #6c6457;
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+/* Floating Dual Service Card (Heizung & Sanitär) */
+.about-floating-card {
+  position: absolute;
+  bottom: 30px;
+  right: 32px;
+  z-index: 8;
+  width: calc(100% - 64px);
+  max-width: 760px;
+  background: rgba(18, 21, 26, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.floating-thumb-box {
+  width: 145px;
+  height: 135px;
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #000;
+}
+
+.floating-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.floating-service-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.service-pill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.tag-heizung {
+  color: var(--amber-gold);
+}
+
+.tag-sanitaer {
+  color: var(--cyan-bright);
+}
+
+.floating-service-title {
+  font-family: var(--font-serif);
+  font-size: 16.5px;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+
+.floating-service-desc {
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.68);
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.floating-service-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.link-heizung {
+  color: var(--amber-gold);
+}
+
+.link-sanitaer {
+  color: var(--cyan-bright);
+}
+
+.floating-service-link .link-arrow {
+  transition: transform 0.25s ease;
+}
+
+.floating-service-link:hover .link-arrow {
+  transform: translateX(4px);
+}
+
+.floating-card-line {
+  width: 1px;
+  height: 90px;
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   RESPONSIVENESS & ADAPTATIONS
+   ========================================================================== */
+@media (max-width: 1200px) {
+  .hero-content-layer {
+    max-width: 480px;
+    top: 11vh;
+  }
+  .service-direct-content {
+    max-width: 440px;
+  }
+  .about-container {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .about-content-column {
+    max-width: 100%;
+    padding: 60px 6vw 40px;
+  }
+  .about-visual-column {
+    min-height: 520px;
+    height: 560px;
+  }
+  .about-experience-badge {
+    left: 30px;
+    top: 30px;
+    transform: none;
+  }
+  .about-floating-card {
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    width: auto;
+    max-width: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-values-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .about-stats-row {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .about-stat-divider {
+    display: none;
+  }
+  .about-floating-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+  }
+  .floating-thumb-box {
+    width: 100%;
+    height: 140px;
+  }
+  .floating-card-line {
+    width: 100%;
+    height: 1px;
+    margin: 4px 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-menu {
+    display: none; /* Hide secondary links on tablet/mobile */
+  }
+  .hero-content-layer {
+    max-width: 440px;
+    top: 10vh;
+  }
+  .hero-scroll-cue {
+    bottom: 24px;
+  }
+  .about-section {
+    padding: 80px 5vw 90px;
+  }
+  .about-values-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .about-floating-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .floating-thumb-box {
+    width: 100%;
+    height: 160px;
+  }
+  .floating-card-line {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar-inner {
+    padding: 0 5vw;
+  }
+  .hero-content-layer {
+    left: 5vw;
+    right: 5vw;
+    width: auto;
+    top: 9vh;
+  }
+  .hero-title {
+    font-size: 34px;
+  }
+  .service-direct-content {
+    max-width: 100%;
+  }
+  .service-direct-heading {
+    font-size: 22px;
+  }
+  .hero-scroll-cue {
+    right: 5vw;
+    bottom: 20px;
+  }
+  .about-headline {
+    font-size: 32px;
+  }
+  .about-values-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-stats-row {
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .about-stat-divider {
+    display: none;
+  }
+  .about-experience-badge {
+    position: static;
+    margin-bottom: 16px;
+    width: 100%;
+  }
+  .about-floating-card {
+    position: static;
+    margin-top: 20px;
+  }
+}
+
+/* Reduced Motion Mode */
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-container {
+    height: 150vh;
+  }
+  .mouse-wheel {
+    animation: none;
+  }
+  .hero-content-layer {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
